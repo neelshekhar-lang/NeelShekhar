@@ -170,4 +170,4 @@ plt.tight_layout()
 st.pyplot(fig)
 plt.close(fig)
 
-st.caption("ECN316 Sustainable Finance — Group Project")
+st.caption("ECN316 Sustainable Finance")
