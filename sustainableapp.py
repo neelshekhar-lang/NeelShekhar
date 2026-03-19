@@ -8,7 +8,7 @@ import pandas as pd
 
 # ——————————
 
-print(”==== Sustainable Finance Portfolio App ====\n”)
+print( "==== Sustainable Finance Portfolio App ====\n”)
 
 r1    = float(input(“Asset 1 Expected Return (%) [e.g., 10]: “)) / 100
 sd1   = float(input(“Asset 1 Standard Deviation (%) [e.g., 15]: “)) / 100
