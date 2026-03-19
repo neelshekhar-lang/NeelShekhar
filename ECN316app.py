@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 st.title("Sustainable Finance Portfolio App")
-st.markdown("**Utility function:** U = E[Rp] - (γ/2)·σ²p + λ·s̄")
 st.divider()
 
 # ------------------------------
