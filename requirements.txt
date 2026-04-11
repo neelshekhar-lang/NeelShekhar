@@ -1,8 +1,8 @@
-scipy>=1.10.0
-numpy>=1.24.0
-pandas>=1.5.0
-matplotlib>=3.7.0
-streamlit>=1.28.0
-requests
+streamlit
+scipy
+numpy
+matplotlib
+pandas
+plotly
 streamlit-extras
-annotated-text
+st-annotated-text
