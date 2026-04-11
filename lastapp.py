@@ -855,4 +855,4 @@ Optimisation uses **scipy.optimize.minimize (SLSQP)** with x1 >= 0, x2 >= 0.
 """)
 
 st.divider()
-st.caption("Ethical Edge - ECN316 Sustainable Finance - QMUL | scipy-optimised free-weight portfolio")
+st.caption("Ethical Edge - ECN316 Sustainable Finance - QMUL")
