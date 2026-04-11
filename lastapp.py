@@ -45,12 +45,12 @@ with st.sidebar:
     }
     if persona != "Custom (manual)":
         pg, pl = persona_defaults[persona]
-        st.success(f"gamma = {pg} | lambda = {pl}")
+        st.success(f"γ = {pg} | λ = {pl}")
     else:
         pg, pl = 4.0, 1.0
 
     st.divider()
-    st.subheader("Step 1 - Risk Attitude", divider="green")
+    st.subheader("Step 1 — Risk Attitude", divider="green")
     q1 = st.radio("If your portfolio dropped 20%, you would...", [
         "Sell immediately - I cannot handle losses",
         "Hold steady and wait it out",
@@ -70,9 +70,9 @@ with st.sidebar:
     }
     gamma_quiz = risk_map[(q1, q2)]
     gamma_default = pg if persona != "Custom (manual)" else gamma_quiz
-    st.info(f"Quiz suggests gamma = {gamma_quiz}" + (f" | Persona gamma = {pg}" if persona != "Custom (manual)" else ""))
-    gamma = st.slider("Fine-tune gamma", 0.5, 10.0, float(gamma_default), 0.5,
-                      help="Higher gamma = more risk-averse. Doubling gamma roughly halves risky positions.")
+    st.info(f"Quiz suggests γ = {gamma_quiz}" + (f" | Persona gamma = {pg}" if persona != "Custom (manual)" else ""))
+    gamma = st.slider("Fine-tune γ", 0.5, 10.0, float(gamma_default), 0.5,
+                      help="Higher γ = more risk-averse. Doubling γ roughly halves risky positions.")
 
     st.divider()
     st.subheader("Step 2 - ESG Commitment", divider="green")
@@ -82,8 +82,8 @@ with st.sidebar:
     lam_map = {"None (lambda=0)": 0.0, "Low (lambda=0.5)": 0.5, "Medium (lambda=1)": 1.0,
                "High (lambda=2)": 2.0, "Max (lambda=4)": 4.0}
     lam_default = pl if persona != "Custom (manual)" else lam_map[esg_label]
-    lam = st.slider("Fine-tune lambda", 0.0, 5.0, float(lam_default), 0.25,
-                    help="lambda > 0: you accept lower Sharpe for a greener portfolio.")
+    lam = st.slider("Fine-tune λ", 0.0, 5.0, float(lam_default), 0.25,
+                    help="λ > 0: you accept lower Sharpe for a greener portfolio.")
 
     st.divider()
     st.subheader("Step 3 - ESG Pillar Weights", divider="green")
@@ -325,7 +325,7 @@ def build_sensitivity_table():
     rows = []; tan_sr = float(tan['Sharpe Ratio'])
     for l in [0.0, 0.5, 1.0, 2.0, 4.0]:
         x = _solve(gamma, l); s = _stats(x, lam_v=l)
-        rows.append({"lambda": l,
+        rows.append({"λ": l,
                      f"{name1}(%)": f"{x[0]*100:.1f}", f"{name2}(%)": f"{x[1]*100:.1f}",
                      "RF(%)": f"{s['Weight RF']*100:.1f}", "E[Rp]": f"{s['Return']*100:.2f}%",
                      "sigma": f"{s['Volatility']*100:.2f}%", "ESG": f"{s['ESG Score']:.1f}",
@@ -342,7 +342,7 @@ def build_report():
     lbl1, _ = traffic_light(esg1); lbl2, _ = traffic_light(esg2)
     lines = ["="*60, " ETHICAL EDGE - PORTFOLIO HEALTH REPORT", f" Generated: {today}", "="*60, "",
              "INVESTOR PROFILE",
-             f"  Persona: {persona}", f"  gamma: {gamma}", f"  lambda: {lam}",
+             f"  Persona: {persona}", f"  γ: {gamma}", f"  λ: {lam}",
              f"  ESG Pillar Wts: E:{w_e:.0%} S:{w_s:.0%} G:{w_g:.0%}", "",
              "ASSETS",
              f"  {name1}: E[R]={r1*100:.1f}% sigma={sd1*100:.1f}% ESG={esg1:.1f}/100 ({lbl1})",
@@ -376,11 +376,11 @@ with tab1:
         low_name  = name2 if x_opt[0] >= x_opt[1] else name1
         high_name = name1 if x_opt[0] >= x_opt[1] else name2
         st.warning(
-            f"**Corner solution detected.** Your ESG preference (lambda = {lam}) is so strong that "
+            f"**Corner solution detected.** Your ESG preference (λ = {lam}) is so strong that "
             f"holding any amount of **{low_name}** (the lower-ESG asset) reduces your utility. "
             f"The optimiser has placed all risky investment in **{high_name}**. "
             f"This is economically meaningful - at this level of ESG preference, "
-            f"diversification is not worth the green cost. To hold both assets, reduce lambda."
+            f"diversification is not worth the green cost. To hold both assets, reduce λ."
         )
 
     st.subheader("Asset ESG Scores", divider="green")
@@ -435,9 +435,9 @@ with tab1:
     style_metric_cards(background_color="#0e0e12", border_left_color="#00e676", border_color="#2a2a3a", box_shadow=True)
 
     if lam > 0 and esg_cost > 0.001:
-        st.success(f"lambda={lam}: **ESG cost = {esg_cost:.4f}** Sharpe vs max-Sharpe portfolio.")
+        st.success(f"λ={lam}: **ESG cost = {esg_cost:.4f}** Sharpe vs max-Sharpe portfolio.")
     elif lam == 0:
-        st.info("lambda=0 - ESG plays no role. ESG Optimal = MV Optimal.")
+        st.info("λ=0 — ESG plays no role. ESG Optimal = MV Optimal.")
     st.progress(esg_cost_pct/100, text=f"ESG cost: {esg_cost:.4f} Sharpe ({esg_cost_pct:.1f}% of max Sharpe)")
     st.divider()
 
@@ -490,7 +490,7 @@ with tab1:
     })
     st.dataframe(comp_df, hide_index=True, use_container_width=True)
     st.divider()
-    st.subheader("Lambda Sensitivity Analysis", divider="green")
+    st.subheader("λ Sensitivity Analysis", divider="green")
     st.dataframe(build_sensitivity_table(), hide_index=True, use_container_width=True)
     st.divider()
     st.subheader("Download Portfolio Report", divider="green")
@@ -599,11 +599,11 @@ with tab2:
 # ════════════════ TAB 3 - EXPLORE ════════════════
 with tab3:
     st.subheader("Interactive Explorers", divider="green")
-    exp1, exp2, exp3, exp4 = st.tabs(["gamma Explorer","lambda Explorer","rho Explorer","Utility Heatmap"])
+    exp1, exp2, exp3, exp4 = st.tabs(["γ Explorer","λ Explorer","rho Explorer","Utility Heatmap"])
 
     with exp1:
         st.markdown("#### How does risk aversion gamma change your portfolio?")
-        st.caption("With free weights: doubling gamma should roughly halve risky positions and increase risk-free weight.")
+        st.caption("With free weights: doubling γ should roughly halve risky positions and increase risk-free weight.")
         gammas = np.linspace(0.5, 10, 40)
         w1g, retg, volg, srg, rfg = [], [], [], [], []
         for g in gammas:
@@ -620,12 +620,12 @@ with tab3:
         ]):
             apply_chart_style(ax, fig_g)
             ax.plot(gammas, yd, color=col, lw=2.2)
-            ax.axvline(gamma, color="white", ls="--", lw=1, alpha=0.5, label=f"Your gamma={gamma}")
+            ax.axvline(gamma, color="white", ls="--", lw=1, alpha=0.5, label=f"Your γ={gamma}")
             ax.fill_between(gammas, yd, min(yd), color=col, alpha=0.07)
-            ax.set_xlabel("gamma", fontsize=9); ax.set_ylabel(yl, fontsize=9)
+            ax.set_xlabel("γ", fontsize=9); ax.set_ylabel(yl, fontsize=9)
             ax.legend(fontsize=7, facecolor="#0e0e12", labelcolor="#c8ccd8", edgecolor="#2a2a3a", framealpha=0.9)
         plt.tight_layout(pad=2.0); st.pyplot(fig_g); plt.close(fig_g)
-        st.info(f"At gamma={gamma}: **{opt['Weight Asset 1']*100:.1f}%** in {name1}, **{opt['Weight Asset 2']*100:.1f}%** in {name2}, **{opt['Weight RF']*100:.1f}%** risk-free.")
+        st.info(f"At γ={gamma}: **{opt['Weight Asset 1']*100:.1f}%** in {name1}, **{opt['Weight Asset 2']*100:.1f}%** in {name2}, **{opt['Weight RF']*100:.1f}%** risk-free.")
 
     with exp2:
         st.markdown("#### How does ESG preference lambda change your portfolio?")
@@ -644,12 +644,12 @@ with tab3:
         ]):
             apply_chart_style(ax, fig_l)
             ax.plot(xl, yd, color=col, lw=2.2)
-            ax.axvline(lam, color="white", ls="--", lw=1, alpha=0.5, label=f"Your lambda={lam}")
+            ax.axvline(lam, color="white", ls="--", lw=1, alpha=0.5, label=f"Your λ={lam}")
             ax.fill_between(xl, yd, min(yd), color=col, alpha=0.07)
-            ax.set_xlabel("lambda", fontsize=9); ax.set_ylabel(yl, fontsize=9); ax.set_title(ttl, fontweight="bold")
+            ax.set_xlabel("λ", fontsize=9); ax.set_ylabel(yl, fontsize=9); ax.set_title(ttl, fontweight="bold")
             ax.legend(fontsize=7, facecolor="#0e0e12", labelcolor="#c8ccd8", edgecolor="#2a2a3a", framealpha=0.9)
         plt.tight_layout(pad=2.0); st.pyplot(fig_l); plt.close(fig_l)
-        st.info(f"At lambda={lam}: ESG={opt['ESG Score']:.1f}, ESG cost={esg_cost:.4f} Sharpe.")
+        st.info(f"At λ={lam}: ESG={opt['ESG Score']:.1f}, ESG cost={esg_cost:.4f} Sharpe.")
 
     with exp3:
         st.markdown("#### How does correlation rho affect diversification?")
@@ -695,8 +695,8 @@ with tab3:
         ax_h.scatter(opt['Weight Asset 1']*100, lam, s=250, marker="*", color="#00e676", zorder=5, ec="white", lw=0.8, label="Your optimum")
         ax_h.axvline(opt['Weight Asset 1']*100, color="#00e676", ls="--", lw=0.8, alpha=0.4)
         ax_h.axhline(lam, color="#00e676", ls="--", lw=0.8, alpha=0.4)
-        ax_h.set_xlabel(f"Weight in {name1} (% of risky mix)", fontsize=10); ax_h.set_ylabel("lambda", fontsize=10)
-        ax_h.set_title(f"Utility Surface (gamma={gamma} fixed)", fontsize=10, fontweight="bold")
+        ax_h.set_xlabel(f"Weight in {name1} (% of risky mix)", fontsize=10); ax_h.set_ylabel("λ", fontsize=10)
+        ax_h.set_title(f"Utility Surface (γ={gamma} fixed)", fontsize=10, fontweight="bold")
         ax_h.legend(fontsize=8, facecolor="#0e0e12", labelcolor="#c8ccd8", edgecolor="#2a2a3a", framealpha=0.9)
         plt.tight_layout(); st.pyplot(fig_h); plt.close(fig_h)
 
@@ -732,7 +732,7 @@ with tab4:
         higher_esg = name1 if esg1 > esg2 else name2
         rf_note = f"\n\n**{opt['Weight RF']*100:.1f}%** is held in the risk-free asset." if abs(opt['Weight RF']) > 0.01 else ""
         st.info(f"**{opt['Weight Asset 1']*100:.1f}%** in {name1}, **{opt['Weight Asset 2']*100:.1f}%** in {name2}.{rf_note}\n\n"
-                f"**{higher_esg}** has the higher ESG - lambda tilts toward it.\ngamma={gamma} and lambda={lam} determine the balance.")
+                f"**{higher_esg}** has the higher ESG - λ tilts toward it.\nγ={gamma} and λ={lam} determine the balance.")
         st.subheader("Diversification Benefit", divider="green")
         if rho < 0.5:
             st.success(f"rho={rho}: diversification benefit present. Min-variance sigma={mvp['Volatility']*100:.2f}%.")
@@ -797,13 +797,13 @@ with tab6:
     sc1c, sc2c = st.columns(2)
     with sc1c:
         st.markdown("### Scenario A")
-        sa_gamma = st.slider("gamma (A)", 0.5, 10.0, gamma,            0.5,  key="sa_g")
-        sa_lam   = st.slider("lambda (A)", 0.0, 5.0, lam,              0.25, key="sa_l")
+        sa_gamma = st.slider("γ (A)", 0.5, 10.0, gamma,            0.5,  key="sa_g")
+        sa_lam   = st.slider("λ (A)", 0.0, 5.0, lam,              0.25, key="sa_l")
         sa_label = st.text_input("Label", "Scenario A", key="sa_name")
     with sc2c:
         st.markdown("### Scenario B")
-        sb_gamma = st.slider("gamma (B)", 0.5, 10.0, max(gamma-2, 0.5), 0.5,  key="sb_g")
-        sb_lam   = st.slider("lambda (B)", 0.0, 5.0, min(lam+1.5, 5.0), 0.25, key="sb_l")
+        sb_gamma = st.slider("γ (B)", 0.5, 10.0, max(gamma-2, 0.5), 0.5,  key="sb_g")
+        sb_lam   = st.slider("λ (B)", 0.0, 5.0, min(lam+1.5, 5.0), 0.25, key="sb_l")
         sb_label = st.text_input("Label", "Scenario B", key="sb_name")
     sa = solve_scenario(sa_gamma, sa_lam); sb = solve_scenario(sb_gamma, sb_lam)
     st.divider(); st.markdown("#### Side-by-Side Results")
@@ -831,9 +831,9 @@ This app maximises over **free** risky weights **x** = (x1, x2):
 
 - **x** = risky asset weights (fractions of total wealth). Remainder **1 - x1 - x2** held in risk-free asset. No sum-to-1 constraint.
 - **mu** = **excess** returns: mu_i = E[R_i] - rf
-- **gamma** = risk aversion. Doubling gamma roughly halves risky positions (audit check 1).
+- **γ** = risk aversion. Doubling γ roughly halves risky positions (audit check 1).
 - **Sigma** = covariance matrix. Off-diagonal = rho * sigma1 * sigma2.
-- **lambda** = ESG taste. lambda=0 gives pure MV solution (audit check 2).
+- **λ** = ESG taste. λ=0 gives pure MV solution (audit check 2).
 - **s_bar = (x1*ESG1 + x2*ESG2) / (x1 + x2)** = risky-asset weighted ESG score (not total wealth).
 
 Optimisation uses **scipy.optimize.minimize (SLSQP)** with x1 >= 0, x2 >= 0.
