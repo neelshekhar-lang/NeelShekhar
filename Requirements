@@ -1,4 +1,7 @@
 streamlit
 numpy
-pandas
 matplotlib
+pandas
+plotly
+streamlit-extras
+st-annotated-text
