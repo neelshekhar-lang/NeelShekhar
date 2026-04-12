@@ -367,7 +367,7 @@ def build_report():
 # TABS
 # ─────────────────────────────────────────────
 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
-    "Results", "Charts", "Explore", "Insights", "AI Explainer", "Compare", "Methodology"
+    "Results", "Charts", "Explore", "Insights", "Explainer", "Compare", "Methodology"
 ])
 
 # ════════════════ TAB 1 - RESULTS ════════════════
