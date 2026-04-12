@@ -739,61 +739,98 @@ with tab4:
         else:
             st.warning(f"rho={rho}: limited diversification. Min-variance sigma={mvp['Volatility']*100:.2f}%.")
 
-# ════════════════ TAB 5 - AI EXPLAINER ════════════════
+# ════════════════ TAB 5 - EXPLAINER ════════════════
 with tab5:
-    st.subheader("AI Portfolio Explainer", divider="green")
-    portfolio_context = f"""You are an expert in sustainable finance and portfolio theory.
+    st.subheader("Portfolio Explainer", divider="green")
+    st.caption("Common questions about your portfolio and ESG investing answered.")
 
-CURRENT SETTINGS:
-- {name1}: E[R]={r1*100:.1f}%, sigma={sd1*100:.1f}%, ESG={esg1:.1f}/100
-- {name2}: E[R]={r2*100:.1f}%, sigma={sd2*100:.1f}%, ESG={esg2:.1f}/100
-- rho={rho}, rf={r_free*100:.1f}%, gamma={gamma}, lambda={lam}
+    faqs = [
+        (
+            "Why is my portfolio split this way?",
+            f"Your portfolio is split **{opt['Weight Asset 1']*100:.1f}%** in {name1} and **{opt['Weight Asset 2']*100:.1f}%** in {name2}"
+            + (f", with **{opt['Weight RF']*100:.1f}%** in the risk-free asset" if abs(opt['Weight RF']) > 0.01 else "")
+            + f". This is the combination that maximises your utility given γ = {gamma} (risk aversion) and λ = {lam} (ESG preference). "
+            f"The higher your λ, the more the portfolio tilts toward **{name1 if esg1 > esg2 else name2}**, which has the higher ESG score."
+        ),
+        (
+            "What does ESG cost mean?",
+            f"ESG cost is the drop in Sharpe ratio you accept in exchange for a greener portfolio. "
+            f"Your current ESG cost is **{esg_cost:.4f}** Sharpe ratio points. "
+            f"The pure max-Sharpe (financial only) portfolio has a Sharpe of **{tan['Sharpe Ratio']:.3f}**, "
+            f"while your ESG-adjusted portfolio has **{opt['Sharpe Ratio']:.3f}**. "
+            f"The difference — {esg_cost:.4f} — is the price you pay for investing more sustainably. "
+            f"A small ESG cost means going green is nearly free financially."
+        ),
+        (
+            "Explain the utility function",
+            "The utility function is: **U = x'μ − (γ/2) x'Σx + λ·s̄**. "
+            "This has three parts. The first term x'μ rewards higher expected return. "
+            "The second term (γ/2)x'Σx penalises risk — higher γ means you dislike risk more. "
+            "The third term λ·s̄ rewards a greener portfolio — s̄ is the weighted average ESG score of your risky assets, "
+            "and λ controls how much you value it. "
+            "The app finds the weights x1 and x2 that make this number as large as possible. "
+            "This comes from Pedersen, Fitzgibbons & Pomorski (2021)."
+        ),
+        (
+            "Is my Sharpe ratio good?",
+            f"Your portfolio Sharpe ratio is **{opt['Sharpe Ratio']:.3f}**. "
+            + ("A Sharpe above 1.0 is considered excellent. " if opt['Sharpe Ratio'] >= 1.0 else
+               "A Sharpe above 0.5 is considered good. " if opt['Sharpe Ratio'] >= 0.5 else
+               "A Sharpe above 0.25 is considered fair. " if opt['Sharpe Ratio'] >= 0.25 else
+               "A Sharpe below 0.25 is considered weak. ")
+            + "The Sharpe ratio measures return per unit of risk taken. "
+            f"The maximum achievable Sharpe with your assets is **{tan['Sharpe Ratio']:.3f}** — your ESG preference costs **{esg_cost:.4f}** of that."
+        ),
+        (
+            "What are sin stocks?",
+            "Sin stocks are shares in companies whose business activities are considered unethical or harmful. "
+            "Common examples include tobacco producers, weapons manufacturers, fossil fuel companies, and gambling operators. "
+            "Many ESG-conscious investors exclude these from their portfolios entirely — known as negative screening. "
+            "Ethical Edge applies SF 1.0 hard screening before optimisation, meaning excluded assets are removed "
+            "before the maths even runs. You can toggle exclusions in the sidebar under Step 4."
+        ),
+        (
+            "How would a higher γ change my portfolio?",
+            f"Increasing γ makes you more risk-averse. Currently γ = {gamma}. "
+            "A higher γ causes the optimiser to shrink your risky positions — x1 and x2 both fall — "
+            "and the freed-up allocation moves into the risk-free asset. "
+            "Doubling γ roughly halves the risky weights. "
+            f"At very high γ (e.g. 10), the model recommends holding mostly the risk-free asset "
+            f"with only a small allocation to risky assets. You can see this visually in the γ Explorer tab."
+        ),
+        (
+            "What is the risk-free asset?",
+            f"The risk-free asset is an investment with guaranteed return and zero risk — typically a government bond or cash. "
+            f"In this model the risk-free rate is **{r_free*100:.1f}%**. "
+            "Unlike traditional portfolio optimisers that force all wealth into risky assets, "
+            "Ethical Edge uses free weights — meaning x1 + x2 can be less than 1, "
+            "with the remainder held in the risk-free asset. "
+            "This is the theoretically correct approach from Pedersen et al. (2021)."
+        ),
+        (
+            "What is the ESG-Sharpe frontier?",
+            "The ESG-Sharpe frontier shows the trade-off between sustainability and financial performance across all possible portfolios. "
+            "The x-axis is the portfolio ESG score and the y-axis is the Sharpe ratio. "
+            "Moving right along the frontier means a greener portfolio, but typically at the cost of a lower Sharpe. "
+            f"Your portfolio sits at ESG = **{opt['ESG Score']:.1f}**, Sharpe = **{opt['Sharpe Ratio']:.3f}**. "
+            "The red star shows the pure max-Sharpe portfolio. The gap between them is the ESG cost."
+        ),
+    ]
 
-RESULTS (scipy free-weight optimisation):
-- ESG Optimal: {opt['Weight Asset 1']*100:.1f}% in {name1}, {opt['Weight Asset 2']*100:.1f}% in {name2}, {opt['Weight RF']*100:.1f}% risk-free
-- Sharpe={opt['Sharpe Ratio']:.3f}, ESG cost={esg_cost:.4f}
-- Objective: max x'mu - (gamma/2)x'Sigma x + lambda*s_bar (Pedersen et al. 2021)
+    for question, answer in faqs:
+        with st.expander(f"❓ {question}"):
+            st.markdown(answer)
 
-Answer clearly in plain English, under 200 words."""
-
-    if "chat_history" not in st.session_state: st.session_state.chat_history = []
-    for msg in st.session_state.chat_history:
-        with st.chat_message(msg["role"], avatar="🤖" if msg["role"]=="assistant" else "👤"):
-            st.markdown(msg["content"])
-    if not st.session_state.chat_history:
-        cols = st.columns(3)
-        for i, sug in enumerate(["Why is my portfolio split this way?","What does ESG cost mean?",
-                                  "Explain the utility function","Is my Sharpe ratio good?",
-                                  "What are sin stocks?","How would higher gamma change things?"]):
-            with cols[i%3]:
-                if st.button(sug, key=f"sug_{i}", use_container_width=True):
-                    st.session_state.chat_history.append({"role":"user","content":sug}); st.rerun()
-    user_input = st.chat_input("Ask about your portfolio or ESG investing...")
-    if user_input:
-        st.session_state.chat_history.append({"role":"user","content":user_input}); st.rerun()
-    if st.session_state.chat_history and st.session_state.chat_history[-1]["role"]=="user":
-        with st.chat_message("assistant", avatar="🤖"):
-            with st.spinner("Thinking..."):
-                try:
-                    api_key = st.secrets.get("ANTHROPIC_API_KEY", "")
-                    resp = requests.post("https://api.anthropic.com/v1/messages",
-                        headers={
-                            "Content-Type": "application/json",
-                            "x-api-key": api_key,
-                            "anthropic-version": "2023-06-01"
-                        },
-                        json={"model":"claude-sonnet-4-6","max_tokens":1000,
-                              "system":portfolio_context,
-                              "messages":[{"role":m["role"],"content":m["content"]} for m in st.session_state.chat_history]},
-                        timeout=30)
-                    reply = resp.json()["content"][0]["text"]
-                except Exception as e:
-                    reply = f"Sorry, could not connect to AI. Error: {e}"
-                st.markdown(reply)
-                st.session_state.chat_history.append({"role":"assistant","content":reply})
-    if st.session_state.chat_history:
-        if st.button("Clear conversation", key="clear_chat"):
-            st.session_state.chat_history = []; st.rerun()
+    st.divider()
+    st.info(
+        f"**Your portfolio at a glance** — "
+        f"{name1}: **{opt['Weight Asset 1']*100:.1f}%** | "
+        f"{name2}: **{opt['Weight Asset 2']*100:.1f}%** | "
+        f"Risk-Free: **{opt['Weight RF']*100:.1f}%** | "
+        f"Sharpe: **{opt['Sharpe Ratio']:.3f}** | "
+        f"ESG: **{opt['ESG Score']:.1f}/100** | "
+        f"ESG Cost: **{esg_cost:.4f}**"
+    )
 
 # ════════════════ TAB 6 - COMPARE ════════════════
 with tab6:
