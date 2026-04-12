@@ -775,8 +775,13 @@ Answer clearly in plain English, under 200 words."""
         with st.chat_message("assistant", avatar="🤖"):
             with st.spinner("Thinking..."):
                 try:
+                    api_key = st.secrets.get("ANTHROPIC_API_KEY", "")
                     resp = requests.post("https://api.anthropic.com/v1/messages",
-                        headers={"Content-Type":"application/json"},
+                        headers={
+                            "Content-Type": "application/json",
+                            "x-api-key": api_key,
+                            "anthropic-version": "2023-06-01"
+                        },
                         json={"model":"claude-sonnet-4-6","max_tokens":1000,
                               "system":portfolio_context,
                               "messages":[{"role":m["role"],"content":m["content"]} for m in st.session_state.chat_history]},
@@ -855,4 +860,4 @@ Optimisation uses **scipy.optimize.minimize (SLSQP)** with x1 >= 0, x2 >= 0.
 """)
 
 st.divider()
-st.caption("Ethical Edge - ECN316 Sustainable Finance - QMUL | scipy-optimised free-weight portfolio")
+st.caption("Ethical Edge - ECN316 Sustainable Finance - QMUL")
